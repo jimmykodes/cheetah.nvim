@@ -81,4 +81,12 @@ function M.python(params)
 	end
 end
 
+function M.lua(params)
+	local fileCmd = string.format("lua %s", params.bufname)
+	return {
+		action("Lua - run file", fileCmd),
+		action_with_args("Lua - run file with args", fileCmd),
+	}
+end
+
 return M
