@@ -3,33 +3,36 @@ local M = {}
 local terminal = require("toggleterm.terminal")
 local plenary = require("plenary")
 
-local function term_opts()
-	return {
-		hidden = true,
-		close_on_exit = false,
-		direction = "float",
-		float_opts = {
-			border = "none",
-			width = 100000,
-			height = 100000,
-		},
-		on_open = function(_)
-			vim.cmd("startinsert!")
-		end,
-		on_close = function(_) end,
-		count = 99,
-	}
+
+local function new_term(opts)
+	return terminal.Terminal:new(
+		vim.tbl_extend(
+			'force',
+			{
+				hidden = true,
+				close_on_exit = false,
+				direction = "float",
+				float_opts = {
+					border = "none",
+					width = 100000,
+					height = 100000,
+				},
+				on_open = function(_)
+					vim.cmd("startinsert!")
+				end,
+				on_close = function(_) end,
+				count = 99,
+			},
+			opts
+		)
+	)
 end
 
 local function action(title, cmd)
 	return {
 		title = title,
 		action = function()
-			local Terminal = terminal.Terminal
-			local opts = term_opts()
-			opts.cmd = cmd
-			local term = Terminal:new(opts)
-			term:toggle()
+			new_term({ cmd = cmd }):toggle()
 		end
 	}
 end
@@ -41,11 +44,7 @@ local function action_with_args(title, cmd)
 			vim.ui.input(
 				{ prompt = "Enter Args:" },
 				function(input)
-					local Terminal = terminal.Terminal
-					local opts = term_opts()
-					opts.cmd = string.format("%s %s", cmd, input)
-					local term = Terminal:new(opts)
-					term:toggle()
+					new_term({ cmd = string.format("%s %s", cmd, input) }):toggle()
 				end)
 		end
 	}
